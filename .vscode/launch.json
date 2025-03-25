@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Web",
+        "program": "lib/main.dart",
+        "request": "launch",
+        "type": "dart",
+        "deviceId": "chrome",
+        "args": [
+            "--dart-define=groqApiKey",
+            "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",
+        ]
+      }
+    ]
+  }

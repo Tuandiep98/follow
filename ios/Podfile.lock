@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - motion (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - motion (from `.symlinks/plugins/motion/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  motion:
+    :path: ".symlinks/plugins/motion/ios"
+
+SPEC CHECKSUMS:
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  motion: d6c42118259b7ff280ca7dc51b4dbfe6125d816e
+
+PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
+
+COCOAPODS: 1.16.2
