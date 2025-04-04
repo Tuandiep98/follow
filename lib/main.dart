@@ -1,18 +1,19 @@
-import 'dart:convert';
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:follow/core/AI.dart';
 import 'package:follow/models/response_data.dart';
-import 'package:intl/intl.dart';
 
-import 'core/groq_ai_utils.dart';
+import 'screen/home_screen.dart';
 import 'screen/widgets/my_custom_scroll_behavior.dart';
 
 const Color darkBlue = Color.fromARGB(255, 18, 32, 47);
 
 void main() {
-  GroqAIUtils.initGroq();
+  AI.init();
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: darkBlue),
       debugShowCheckedModeBanner: false,
       scrollBehavior: MyCustomScrollBehavior(),
-      home: const Scaffold(body: VerticalParallaxCarousel()),
+      home: HomeScreen(),
     );
   }
 }
@@ -46,16 +47,17 @@ class _VerticalParallaxCarouselState extends State<VerticalParallaxCarousel> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      var response = await _getData(
-          'Hôm nay ngày ${DateFormat('hh:mm:ss dd/MM/yyyy').format(DateTime.now())}, top các phòng giảm giá trên agoda');
-      if (response.isNotEmpty) {
-        try {
-          data = [ResponseData.fromJson(jsonDecode(response))];
-          setState(() {});
-        } catch (e) {
-          debugPrint(e.toString());
-        }
-      }
+      // await AI.getModels();
+      // var response = await _getData(
+      //     'Hôm nay ngày ${DateFormat('hh:mm:ss dd/MM/yyyy').format(DateTime.now())}, top các phòng giảm giá trên agoda');
+      // if (response.isNotEmpty) {
+      //   try {
+      //     data = [ResponseData.fromJson(jsonDecode(response))];
+      //     setState(() {});
+      //   } catch (e) {
+      //     debugPrint(e.toString());
+      //   }
+      // }
       setState(() {
         _loading = false;
       });
@@ -64,14 +66,7 @@ class _VerticalParallaxCarouselState extends State<VerticalParallaxCarousel> {
 
   Future<String> _getData(String promt) async {
     String response = '';
-    try {
-      GroqAIUtils.setCustomInstructions(
-          "You are a helpful assistant who always responds in a friendly, concise manner. "
-          "Use casual language and provide clear, direct answers."
-          "All the image ensure to be in 16:9 aspect ratio, valid url"
-          "Bạn luôn luôn trả lời bằng tiếng anh và là dạng json, theo cấu trúc ${ResponseData().toConstructorString()}, chỉ mỗi dữ liệu json nằm trong ngoặc {}");
-      response = await GroqAIUtils.sendMessage(promt);
-    } catch (e) {
+    try {} catch (e) {
       debugPrint(e.toString());
     }
     debugPrint(response);
@@ -87,23 +82,31 @@ class _VerticalParallaxCarouselState extends State<VerticalParallaxCarousel> {
               child: CupertinoActivityIndicator(),
             ),
           )
-        : data.isEmpty || data.first.featuredArticles.isEmpty
-            ? SizedBox(
-                height: MediaQuery.of(context).size.height,
-                child: Center(
-                  child: Text('No data found'),
+        : locations.isEmpty
+            // data.isEmpty || data.first.featuredArticles.isEmpty
+            ? GestureDetector(
+                onTap: () async {
+                  await AI.speech('hello');
+                },
+                child: Container(
+                  color: Colors.white,
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(
+                    child: Text('No data found'),
+                  ),
                 ),
               )
             : PageView.builder(
                 scrollDirection: Axis.vertical, // Vertical scrolling
                 physics:
                     const ClampingScrollPhysics(), // Smooth snapping, works on web
-                itemCount: data.first.featuredArticles.length,
+                itemCount:
+                    locations.length, // data.first.featuredArticles.length,
                 itemBuilder: (context, index) {
                   return LocationListItem(
-                    imageUrl: data.first.featuredArticles[index].thumb,
-                    name: data.first.featuredArticles[index].title,
-                    country: data.first.featuredArticles[index].category,
+                    imageUrl: locations[index].imageUrl,
+                    name: locations[index].name,
+                    country: locations[index].place,
                   );
                 },
               );
@@ -126,6 +129,7 @@ class LocationListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      fit: StackFit.expand,
       children: [
         MediaQuery.of(context).size.width > MediaQuery.of(context).size.height
             ? const SizedBox.shrink()
@@ -141,7 +145,7 @@ class LocationListItem extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage(imageUrl),
+          image: CachedNetworkImageProvider(imageUrl),
           fit: BoxFit.cover,
           filterQuality: FilterQuality.low,
           onError: (exception, stackTrace) => const SizedBox.shrink(),
@@ -164,15 +168,15 @@ class LocationListItem extends StatelessWidget {
         backgroundImageKey: _backgroundImageKey,
       ),
       children: [
-        Image.network(
-          imageUrl,
+        CachedNetworkImage(
+          imageUrl: imageUrl,
           key: _backgroundImageKey,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.width,
           fit: BoxFit.cover,
           filterQuality: FilterQuality.high,
-          gaplessPlayback: true,
-          errorBuilder: (context, error, stackTrace) {
-            var a = error;
-            return const SizedBox.shrink();
+          errorWidget: (context, error, stackTrace) {
+            return Icon(Icons.error);
           },
         ),
       ],
@@ -197,7 +201,7 @@ class LocationListItem extends StatelessWidget {
   Widget _buildTitleAndSubtitle() {
     return Positioned(
       left: 20,
-      bottom: 20,
+      bottom: 100,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,3 +275,51 @@ class ParallaxFlowDelegate extends FlowDelegate {
         backgroundImageKey != oldDelegate.backgroundImageKey;
   }
 }
+
+class Location {
+  const Location({
+    required this.name,
+    required this.place,
+    required this.imageUrl,
+  });
+
+  final String name;
+  final String place;
+  final String imageUrl;
+}
+
+const urlPrefix =
+    'https://docs.flutter.dev/cookbook/img-files/effects/parallax';
+const locations = [
+  Location(
+    name: 'Mount Rushmore',
+    place: 'U.S.A',
+    imageUrl: '$urlPrefix/01-mount-rushmore.jpg',
+  ),
+  Location(
+    name: 'Gardens By The Bay',
+    place: 'Singapore',
+    imageUrl: '$urlPrefix/02-singapore.jpg',
+  ),
+  Location(
+    name: 'Machu Picchu',
+    place: 'Peru',
+    imageUrl: '$urlPrefix/03-machu-picchu.jpg',
+  ),
+  Location(
+    name: 'Vitznau',
+    place: 'Switzerland',
+    imageUrl: '$urlPrefix/04-vitznau.jpg',
+  ),
+  Location(
+    name: 'Bali',
+    place: 'Indonesia',
+    imageUrl: '$urlPrefix/05-bali.jpg',
+  ),
+  Location(
+    name: 'Mexico City',
+    place: 'Mexico',
+    imageUrl: '$urlPrefix/06-mexico-city.jpg',
+  ),
+  Location(name: 'Cairo', place: 'Egypt', imageUrl: '$urlPrefix/07-cairo.jpg'),
+];
