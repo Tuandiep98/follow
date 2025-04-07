@@ -1,16 +1,18 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "Web",
-        "program": "lib/main.dart",
-        "request": "launch",
-        "type": "dart",
-        "deviceId": "chrome",
-        "args": [
-            "--dart-define=groqApiKey",
-            "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",
-        ]
-      }
-    ]
-  }
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter Web",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "debug",
+      "deviceId": "chrome",
+      "args": [
+        "--web-port=8080",
+        "--web-hostname=localhost",
+        "--web-renderer=canvaskit"
+      ]
+    }
+  ]
+}

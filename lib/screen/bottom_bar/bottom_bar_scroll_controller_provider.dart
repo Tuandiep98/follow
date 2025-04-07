@@ -7,10 +7,10 @@ class BottomBarScrollControllerProvider extends InheritedWidget {
   /// property in the `BottomBar` will be used to control the `child`
   /// and to react on how it scrolls.
   final ScrollController scrollController;
-  const BottomBarScrollControllerProvider({
-    required Widget child,
+  const BottomBarScrollControllerProvider({super.key, 
+    required super.child,
     required this.scrollController,
-  }) : super(child: child);
+  });
   @override
   bool updateShouldNotify(BottomBarScrollControllerProvider oldWidget) =>
       scrollController != oldWidget.scrollController;

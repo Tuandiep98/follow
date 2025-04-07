@@ -1,33 +1,113 @@
-import 'dart:io';
-
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:follow/core/string_utils.dart';
+import 'package:follow/env/env.dart';
 import 'package:just_audio/just_audio.dart';
 
-class Audio {
-  static final AudioPlayer player = AudioPlayer();
-  static String sourcePath = '';
+import 'package:http/http.dart' as http;
 
-  static Future<void> play(File file) async {
-    try {
-      await player.setAudioSource(AudioSource.file(file.path));
-      await player.play();
-    } catch (e) {
-      debugPrint('audio error: ${e.toString()}');
+class Audio {
+  static final FlutterSound player = FlutterSound();
+
+  static Future<void> playBase64Audio(String base64AudioData) async {
+    String cleanBase64String = base64AudioData.split(',').last;
+    final bytes = base64Decode(cleanBase64String);
+
+    await player.thePlayer.openPlayer();
+    await player.thePlayer.setVolume(1.0);
+    await player.thePlayer.startPlayer(
+      fromDataBuffer: bytes,
+      codec: Codec.mp3,
+      whenFinished: () {
+        debugPrint('Audio finished playing');
+      },
+    );
+
+    await player.thePlayer.closePlayer();
+  }
+
+  static Future<void> detectAudioIntervals(String audioPath) async {
+    final player = AudioPlayer();
+
+    await player.setFilePath(audioPath);
+
+    // Volume threshold: if the audio volume goes above this threshold, it's considered significant
+    const double volumeThreshold = 0.1;
+
+    // Initialize a list to store the intervals
+    List<Map<String, Duration?>> intervals = [];
+
+    debugPrint('started playing');
+    // Monitor the audio position and approximate volume
+    player.positionStream.listen((position) async {
+      double volume =
+          player.volume; // This is just an approximation; refine as needed
+
+      if (volume > volumeThreshold) {
+        // Mark the interval with volume above threshold
+        if (intervals.isEmpty || intervals.last['end'] != null) {
+          intervals.add({'start': position, 'end': null});
+        }
+      } else {
+        if (intervals.isNotEmpty && intervals.last['end'] == null) {
+          intervals.last['end'] = position;
+        }
+      }
+    });
+
+    // After some time or when audio finishes, check intervals
+    player.positionStream.listen((position) {
+      if (position == player.duration) {
+        // Print out all the intervals with volume above threshold
+        for (var interval in intervals) {
+          debugPrint(
+              'Volume interval: Start - ${interval['start']}, End - ${interval['end']}');
+        }
+      }
+    });
+  }
+
+  /// response format: lrc
+  /// model: whisper-1
+  static Future<String> transcribeAudio(Uint8List audioFileBytes) async {
+    final apiKey = Env.apiKey; // Replace with your Whisper API key
+    final uri = Uri.parse(
+        'https://api.openai.com/v1/audio/transcriptions'); // Endpoint URL
+
+    // Open the audio file
+    var request = http.MultipartRequest('POST', uri);
+    request.fields['model'] = 'whisper-1'; // Specify the model
+    request.fields['response_format'] = 'vtt'; // Specify the response format
+    // Add the audio file to the request
+    request.files.add(http.MultipartFile.fromBytes('file', audioFileBytes,
+        filename: 'audio.wav'));
+
+    // Add authorization header
+    request.headers['Authorization'] = 'Bearer $apiKey';
+
+    // Send the request
+    var response = await request.send();
+
+    // Parse the response
+    if (response.statusCode == 200) {
+      var responseData = await response.stream.bytesToString();
+      return StringUtils.convertWebVttToLrc(responseData);
+    } else {
+      return 'Failed to transcribe audio. Status code: ${response.statusCode}';
     }
   }
 
-  static Future<void> test() async {
+  static Future<Uint8List?> getOnlineAudioBytes(String url) async {
     try {
-      player.setAudioSource(
-        AudioSource.uri(
-          Uri.parse(
-              'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'),
-        ),
-      );
-      await player.play();
-      print('Player result:');
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      }
     } catch (e) {
-      print('Error in AudioPlayer: $e');
+      debugPrint('Error: $e');
     }
+    return null;
   }
 }

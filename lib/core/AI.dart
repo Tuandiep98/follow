@@ -1,45 +1,59 @@
-import 'dart:io';
-
-import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/material.dart';
-import 'package:follow/core/audio.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
+import 'package:follow/core/tts_service_web.dart';
 import 'package:follow/env/env.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:openai_dart/openai_dart.dart';
 
 class AI {
-  static List<OpenAIModelModel> models = [];
-
-  static void init() {
-    OpenAI.apiKey = Env.apiKey;
-    OpenAI.showLogs = true;
-    OpenAI.showResponsesLogs = true;
-  }
-
-  static Future<List<OpenAIModelModel>> getModels() async {
-    if (models.isEmpty) {
-      try {
-        models = await OpenAI.instance.model.list();
-      } catch (e) {
-        debugPrint(e.toString());
-      }
-    }
-    return models;
-  }
+  static final client = OpenAIClient(apiKey: Env.apiKey);
 
   static Future<void> speech(String input) async {
     try {
-      // The speech request.
-      File speechFile = await OpenAI.instance.audio.createSpeech(
-        model: "tts-1",
-        input: input,
-        voice: "onyx",
-        responseFormat: OpenAIAudioSpeechResponseFormat.opus,
-        outputFileName: DateTime.now().microsecondsSinceEpoch.toString(),
+      final stream = TTSServiceWeb(Env.apiKey).tts(
+        'https://api.openai.com/v1/audio/speech',
+        {
+          'model': 'tts-1',
+          'voice': 'onyx',
+          'speed': 1.0,
+          'input': input,
+          'response_format': 'pcm',
+          'stream': true,
+        },
       );
 
-      await Audio.play(speechFile);
+      final currentSound = SoLoud.instance.setBufferStream(
+        maxBufferSizeBytes: 1024 * 1024 * 5,
+        channels: Channels.mono,
+        format: BufferType.s16le,
+        onBuffering: (isBuffering, handle, time) async {
+          debugPrint('isBuffering: $isBuffering handle: $handle, time: $time');
+        },
+      );
+
+      int chunkNumber = 0;
+      stream.listen((chunk) async {
+        try {
+          SoLoud.instance.addAudioDataStream(
+            currentSound,
+            chunk,
+          );
+          if (chunkNumber == 0) {
+            await SoLoud.instance.play(currentSound);
+          }
+          chunkNumber++;
+          // print('chunk number: $chunkNumber');
+          // print('chunk length: ${chunk.length}');
+        } on SoLoudPcmBufferFullCppException {
+          debugPrint('pcm buffer full or stream already set '
+              'to be ended');
+        } catch (e) {
+          debugPrint(e.toString());
+        }
+      }, onDone: () {
+        SoLoud.instance.setDataIsEnded(currentSound);
+      });
     } catch (e) {
-      debugPrint('speech ai error: ${e.toString()}');
+      debugPrint("Error: $e");
     }
   }
 }

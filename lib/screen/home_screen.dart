@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:follow/main.dart';
 import 'package:follow/screen/bottom_bar/bottom_bar.dart';
+import 'package:follow/screen/setting/setting_screen.dart';
 import 'package:very_good_infinite_list/very_good_infinite_list.dart';
 
 class PageData {
@@ -26,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen>
     PageData(const Center(child: Text('Search')), Colors.black),
     PageData(const Center(child: Text('Add')), Colors.green),
     PageData(const Center(child: Text('Favorite')), Colors.blue),
-    PageData(const Center(child: Text('Settings')), Colors.pink),
+    PageData(const SettingScreen(), Colors.pink),
   ];
 
   @override
