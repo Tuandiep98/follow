@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:follow/core/audio.dart';
 import 'package:follow/core/storage_manager.dart';
 import 'package:follow/core/string_utils.dart';
-import 'package:follow/core/whisper.dart';
 import 'package:follow/screen/flutter_lyric/lyric_ui/lyric_ui.dart';
 import 'package:follow/screen/flutter_lyric/lyric_ui/ui_netease.dart';
 import 'package:follow/screen/flutter_lyric/lyrics_log.dart';

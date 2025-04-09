@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
-import 'package:follow/core/string_utils.dart';
 import 'package:follow/env/env.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -73,7 +72,7 @@ class Audio {
   /// model: whisper-1
   static Future<String> transcribeAudio(Uint8List audioFileBytes) async {
     print('start\n');
-    final Stopwatch _stopwatch = Stopwatch()..start();
+    final Stopwatch stopwatch = Stopwatch()..start();
     final apiKey = Env.apiKey; // Replace with your Whisper API key
     final uri = Uri.parse(
         'https://api.openai.com/v1/audio/transcriptions'); // Endpoint URL
@@ -99,8 +98,8 @@ class Audio {
     // Send the request
     var response = await request.send();
 
-    print('take: ${_stopwatch.elapsed.inSeconds}seconds.');
-    _stopwatch.stop();
+    print('take: ${stopwatch.elapsed.inSeconds}seconds.');
+    stopwatch.stop();
     // Parse the response
     if (response.statusCode == 200) {
       var responseData = await response.stream.bytesToString();

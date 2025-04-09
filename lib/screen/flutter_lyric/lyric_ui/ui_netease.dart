@@ -62,7 +62,10 @@ class UINetease extends LyricUI {
 
   @override
   TextStyle getPlayingMainTextStyle() => TextStyle(
-      color: Colors.white, fontSize: defaultSize, fontFamily: 'NotoSansSC');
+        color: Colors.white,
+        fontSize: defaultSize,
+        fontFamily: 'NotoSansSC',
+      );
 
   @override
   double getInlineSpace() => inlineGap;

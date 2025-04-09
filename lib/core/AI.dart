@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_soloud/flutter_soloud.dart';
-import 'package:follow/core/tts_service_web.dart';
 import 'package:follow/env/env.dart';
 import 'package:openai_dart/openai_dart.dart';
 
