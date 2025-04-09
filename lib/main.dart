@@ -26,7 +26,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: darkBlue),
+      theme: ThemeData(
+        fontFamily: 'NotoSansSC',
+      ).copyWith(
+        scaffoldBackgroundColor: darkBlue,
+      ),
       debugShowCheckedModeBanner: false,
       scrollBehavior: MyCustomScrollBehavior(),
       home: HomeScreen(),
@@ -206,6 +210,7 @@ class LocationListItem extends StatelessWidget {
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
+              fontFamily: 'NotoSansSC',
             ),
           ),
           Text(

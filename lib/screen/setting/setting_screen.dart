@@ -30,7 +30,7 @@ class _SettingScreenState extends State<SettingScreen>
   AudioPlayer? audioPlayer;
   double sliderProgress = 111658;
   int playProgress = 111658;
-  double max_value = 211658;
+  double max_value = 311658;
   bool isTap = false;
 
   var exampleLyric = '';
@@ -60,8 +60,8 @@ class _SettingScreenState extends State<SettingScreen>
 
   Future<void> _initData() async {
     audioBytes = null;
-    // url =
-    //     'https://cf-media.sndcdn.com/cIL7I5WRmK1t.128.mp3?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiKjovL2NmLW1lZGlhLnNuZGNkbi5jb20vY0lMN0k1V1JtSzF0LjEyOC5tcDMqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzQ0MDE2MzMxfX19XX0_&Signature=GDKKY50QcHitLENsu1ummjL8XBc5nvmrBIt2jCNfNUN3KlMpMpUZFJLBP2QatTtB0BzE91KJJ-2OQjyFIpJjckZGb8XGUDot~xRarp4U2Qf89x4ab70WaRB1EXniYFbueUzMAsxmLoGctrlJThUO45xR0wibCe0dVfNQthwhZxguowY08HpU-AxE2DAhs2xx7AoBBUJONn8bdAns0a0B8sKOFTfRgxOgLzEuKfupcVrXs0B2iGDDTzt3SqKLGfkcmdReRwKDXOYNZG~wi9A35B4t0aeMCrD0cfUBAb5cd1SSTt92jqog9uwQhyG0fHKKgXrYtXSJyIKZNsuJbueZyQ__&Key-Pair-Id=APKAI6TU7MMXM5DG6EPQ';
+    url =
+        'https://cdn303.savetube.su/download-direct/audio/128/332da6453e48d147188891b762bc8bcae2a0a520';
     String lyrics = '';
     var storageData = StorageManager.readData(url.isEmpty ? filePath : url);
     if (storageData != null) {

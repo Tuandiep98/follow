@@ -116,6 +116,8 @@ class Audio {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         return response.bodyBytes;
+      } else {
+        debugPrint('api error: ${response.statusCode}');
       }
     } catch (e) {
       debugPrint('Error: $e');

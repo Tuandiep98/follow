@@ -106,17 +106,13 @@ class StringUtils {
         List<String> wordSplited = segment.text.split(' ');
         String pharseTemp = '';
         for (var item in wordSplited) {
-          var itemTemp = item.replaceAll(',', '');
-          itemTemp = item.replaceAll('.', '');
+          var itemTemp = removeVietnamesePunctuation(item);
           if (itemTemp == ' ') {
             pharseTemp += ' ';
           } else {
             var temp = words
                 .where((x) =>
-                    x.word
-                            .replaceAll(',', 'replace')
-                            .replaceAll('.', '')
-                            .toLowerCase() ==
+                    removeVietnamesePunctuation(x.word).toLowerCase() ==
                         itemTemp.toLowerCase() &&
                     x.start >= segment.start &&
                     x.end <= segment.end)
@@ -125,14 +121,33 @@ class StringUtils {
               Word word = temp.reduce((currentMin, element) =>
                   currentMin.start < element.start ? currentMin : element);
               int wordDurationTime = (word.end == word.start)
-                  ? 40
+                  ? (10 * word.word.length)
                   : ((word.end - word.start) * 1000).toInt();
               int wordPlayTime = (word.start * 1000).toInt();
-              pharseTemp += '$itemTemp ($wordPlayTime,$wordDurationTime)';
-              lastWordPlayTime = wordPlayTime;
+              if (item.contains('.')) {
+                wordDurationTime += 10;
+              }
+              if (item.contains(',')) {
+                wordDurationTime += 5;
+              }
+              pharseTemp += '$item ($wordPlayTime,$wordDurationTime)';
+              if (lastWordPlayTime < wordPlayTime) {
+                lastWordPlayTime = wordPlayTime;
+              }
             } else {
-              debugPrint('no word found: $itemTemp');
-              pharseTemp += '$item ($lastWordPlayTime,100)';
+              if (item.length > 1) {
+                debugPrint(
+                    'no word found: ${removeVietnamesePunctuation(itemTemp)}');
+                int durationOfEmptyWord = 5 * item.length;
+                if (item.contains('.')) {
+                  durationOfEmptyWord += 10;
+                }
+                if (item.contains(',')) {
+                  durationOfEmptyWord += 5;
+                }
+                pharseTemp += '$item ($lastWordPlayTime,$durationOfEmptyWord)';
+                lastWordPlayTime += durationOfEmptyWord;
+              }
             }
           }
         }
@@ -143,13 +158,18 @@ class StringUtils {
       debugPrint(e.toString());
     }
     return res.isNotEmpty
-        ? """[ti:If I Didn't Love You]
-[ar:Jason Aldean/Carrie Underwood]
-[al:If I Didn't Love You]
+        ? """
+[ti:]
+[ar:]
+[al:]
 [by:]
 [offset:0]
-    $res
-    """
+$res"""
         : '';
+  }
+
+  static String removeVietnamesePunctuation(String text) {
+    // Biểu thức chính quy để thay thế các dấu câu tiếng Việt
+    return text.replaceAll(RegExp(r'[^\w\s]'), '');
   }
 }

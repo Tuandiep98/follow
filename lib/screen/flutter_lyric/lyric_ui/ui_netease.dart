@@ -43,24 +43,26 @@ class UINetease extends LyricUI {
         );
 
   @override
-  TextStyle getPlayingExtTextStyle() =>
-      TextStyle(color: Colors.grey[300], fontSize: defaultExtSize);
+  TextStyle getPlayingExtTextStyle() => TextStyle(
+      color: Colors.grey[300],
+      fontSize: defaultExtSize,
+      fontFamily: 'NotoSansSC');
 
   @override
   TextStyle getOtherExtTextStyle() => TextStyle(
-        color: Colors.grey[300],
-        fontSize: defaultExtSize,
-      );
+      color: Colors.grey[300],
+      fontSize: defaultExtSize,
+      fontFamily: 'NotoSansSC');
 
   @override
-  TextStyle getOtherMainTextStyle() =>
-      TextStyle(color: Colors.grey[200], fontSize: otherMainSize);
+  TextStyle getOtherMainTextStyle() => TextStyle(
+      color: Colors.grey[200],
+      fontSize: otherMainSize,
+      fontFamily: 'NotoSansSC');
 
   @override
   TextStyle getPlayingMainTextStyle() => TextStyle(
-        color: Colors.white,
-        fontSize: defaultSize,
-      );
+      color: Colors.white, fontSize: defaultSize, fontFamily: 'NotoSansSC');
 
   @override
   double getInlineSpace() => inlineGap;

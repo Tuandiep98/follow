@@ -11,8 +11,7 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
-./env/.env
-./env/env.g.dart
+lib/env/.env
 
 # IntelliJ related
 *.iml
