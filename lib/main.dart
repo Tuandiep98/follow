@@ -82,7 +82,7 @@ class _VerticalParallaxCarouselState extends State<VerticalParallaxCarousel> {
     return _loading
         ? SizedBox(
             height: MediaQuery.of(context).size.height,
-            child: Center(
+            child: const Center(
               child: CupertinoActivityIndicator(),
             ),
           )
@@ -232,8 +232,8 @@ class LocationListItem extends StatelessWidget {
         children: [
           IconButton(
             onPressed: () async {
-              await AI.speech(
-                  'He lô bà Thảo, bà có khỏe không? Hôm nay trời đẹp quá, bà có muốn đi dạo không?');
+              // await AI.speech(
+              //     'He lô bà Thảo, bà có khỏe không? Hôm nay trời đẹp quá, bà có muốn đi dạo không?');
               // await AI.speech(
               //     'Chương 945: Một Mình Uống Rượu Dưới TrăngBầu trời quang đãng, vầng trăng sáng treo cao, tỏa ánh sáng dịu dàng xuống mặt đất. Ánh trăng chảy tràn nhẹ nhàng, tựa như một dòng sông ánh bạc.Trần Bình An ngồi một mình trên mái nhà trong tông môn Uyên Ngục, tay cầm bình rượu, lặng lẽ uống. Gió đêm thoảng qua, khẽ làm tung bay vạt áo xanh của hắn, mang theo một vẻ thanh thoát xa cách.Hắn không uống rượu địa phương của Uyên Ngục Tông, mà là một bình rượu quế mang theo từ Phước Địa Liên Hoa. Rượu không quá mạnh, nhưng mang hương thơm thoang thoảng, lưu lại dư vị dễ chịu.Trần Bình An hiếm khi uống rượu một mình như thế này, nhưng tối nay dường như khác biệt. Có lẽ là vì vẻ đẹp tĩnh lặng của ánh trăng, hay sự yên ả của khoảnh khắc đã khơi dậy điều gì đó trong lòng hắn. Hắn nhấp một ngụm, để vị ngọt nhẹ của rượu quế lan tỏa trên đầu lưỡi, rồi ngước nhìn vầng trăng, chìm vào suy tư.Xa xa, âm thanh của Uyên Ngục Tông vọng lại mơ hồ—tiếng trò chuyện khe khẽ của các đệ tử tuần tra đêm hoặc tiếng lá xào xạc trong gió. Nhưng ở đây, chỉ có hắn, vầng trăng và bình rượu. Với một người đã đi qua vô số con đường và đối mặt với muôn vàn thử thách, sự cô đơn hiếm hoi này dường như là một thứ xa xỉ.Hắn nghiêng bình rượu, để chất lỏng mát lạnh trôi xuống cổ họng, khẽ lẩm bẩm: “Ánh trăng rực rỡ, sàn nhà phủ sương…” Đó là một câu thơ cổ, đã nhiều năm hắn không ngâm nga. Một nụ cười nhạt thoáng qua trên môi khi hắn tiếp tục, “Ta nâng chén mời trăng, cùng bóng ta thành ba.”Lời thơ vang vọng trong không gian, hòa quyện cùng màn đêm. Trần Bình An không phải người đa sầu đa cảm, nhưng tối nay, sự bao la của bầu trời và khoảnh khắc cô đơn khiến hắn cảm nhận được sức nặng của hành trình mình đã đi qua. Hắn nghĩ đến những người bạn—một số gần, một số xa—rải rác khắp thế gian như những vì sao trên trời. Hắn tự hỏi họ đang thế nào dưới cùng vầng trăng này.Lại một ngụm nữa. Bình rượu giờ đã vơi nửa. Hắn đặt nó xuống bên cạnh, ngả người ra sau, chống tay, ánh mắt dõi theo đường nét của vầng trăng. Đêm nay trăng rằm, tròn đầy, tỏa ra một sức mạnh thầm lặng. Giống như con đường kiếm đạo, hắn nghĩ—đơn giản mà sâu sắc, vững vàng mà luôn biến đổi.Một cơn gió bất chợt mang theo hương thông từ khu rừng gần đó, hòa lẫn với mùi thơm của hoa quế. Trần Bình An nhắm mắt một lát, để cảm giác ấy tràn qua. Trong tâm trí, hắn thấy những gương mặt thân thương: Ninh Diêu với ánh mắt sắc bén và ý chí kiên định; Lưu Cảnh Long, vững chãi như núi; và Bùi Tiền, đã trưởng thành rất nhiều nhưng vẫn mang nét của cô bé ngày nào.Hắn mở mắt, khẽ cười. “Một mình uống rượu dưới trăng… cũng không tệ.”Đêm dần trôi, và Trần Bình An vẫn ở đó, một bóng người đơn độc dưới ánh bạc, đắm mình trong sự tĩnh lặng đầy mãn nguyện.');
             },

@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:follow/core/audio.dart';
 import 'package:follow/core/storage_manager.dart';
 import 'package:follow/core/string_utils.dart';
+import 'package:follow/screen/animated_mesh_gradient_view.dart';
 import 'package:follow/screen/flutter_lyric/lyric_ui/lyric_ui.dart';
 import 'package:follow/screen/flutter_lyric/lyric_ui/ui_netease.dart';
 import 'package:follow/screen/flutter_lyric/lyrics_log.dart';
 import 'package:follow/screen/flutter_lyric/lyrics_model_builder.dart';
 import 'package:follow/screen/flutter_lyric/lyrics_reader_model.dart';
 import 'package:follow/screen/flutter_lyric/lyrics_reader_widget.dart';
+import 'package:follow/screen/mesh_gradient_view.dart';
 import 'package:follow/screen/setting/const.dart';
 import 'dart:typed_data';
 
@@ -41,9 +43,10 @@ class _SettingScreenState extends State<SettingScreen>
 
   bool _loading = true;
 
-  String filePath = 'assets/music2.wav';
+  String filePath = 'assets/music1.mp3';
   String url = '';
   Uint8List? audioBytes;
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -59,8 +62,8 @@ class _SettingScreenState extends State<SettingScreen>
 
   Future<void> _initData() async {
     audioBytes = null;
-    url =
-        'https://cdn303.savetube.su/download-direct/audio/128/332da6453e48d147188891b762bc8bcae2a0a520';
+    // url =
+    //     'https://cdn303.savetube.su/download-direct/audio/128/576f0afa3ff9fedaf1c7072b6969cc99d79ef8b6';
     String lyrics = '';
     var storageData = StorageManager.readData(url.isEmpty ? filePath : url);
     if (storageData != null) {
@@ -100,6 +103,48 @@ class _SettingScreenState extends State<SettingScreen>
     }
   }
 
+  Future<void> _play() async {
+    try {
+      if (playing) {
+        audioPlayer?.pause();
+        return;
+      }
+
+      if (audioPlayer == null) {
+        audioPlayer = AudioPlayer()
+          ..play(url.isNotEmpty
+              ? UrlSource(url)
+              : AssetSource(filePath.replaceAll('assets/', '')));
+        setState(() {
+          playing = true;
+        });
+        audioPlayer?.onDurationChanged.listen((Duration event) {
+          setState(() {
+            max_value = event.inMilliseconds.toDouble();
+          });
+        });
+        audioPlayer?.onPositionChanged.listen((Duration event) {
+          if (isTap) return;
+          setState(() {
+            sliderProgress = event.inMilliseconds.toDouble();
+            playProgress = event.inMilliseconds;
+          });
+        });
+
+        audioPlayer?.onPlayerStateChanged.listen((PlayerState state) {
+          setState(() {
+            playing = state == PlayerState.playing;
+          });
+        });
+      } else {
+        audioPlayer?.resume();
+      }
+    } catch (e) {
+      playing = false;
+      debugPrint(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,22 +158,21 @@ class _SettingScreenState extends State<SettingScreen>
             child: CupertinoActivityIndicator(),
           )
         : Column(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                flex: 3,
                 child: buildReaderWidget(),
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      ...buildPlayControl(),
-                      // ...buildUIControl(),
-                    ],
-                  ),
-                ),
-              ),
+              // Expanded(
+              //   child: SingleChildScrollView(
+              //     child: Column(
+              //       children: [
+              //         ...buildPlayControl(),
+              //         // ...buildUIControl(),
+              //       ],
+              //     ),
+              //   ),
+              // ),
             ],
           );
   }
@@ -137,6 +181,7 @@ class _SettingScreenState extends State<SettingScreen>
 
   Stack buildReaderWidget() {
     return Stack(
+      fit: StackFit.expand,
       children: [
         ...buildReaderBackground(),
         LyricsReader(
@@ -145,7 +190,7 @@ class _SettingScreenState extends State<SettingScreen>
           position: playProgress,
           lyricUi: lyricUI,
           playing: playing,
-          size: Size(double.infinity, MediaQuery.of(context).size.height * .75),
+          size: Size(double.infinity, double.infinity),
           emptyBuilder: () => Center(
             child: Text(
               "No lyrics",
@@ -178,7 +223,25 @@ class _SettingScreenState extends State<SettingScreen>
               ],
             );
           },
-        )
+        ),
+        Positioned(
+          right: 20,
+          bottom: 100,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IconButton(
+                iconSize: 36,
+                color: Colors.white,
+                onPressed: () async => await _play(),
+                icon: Icon(playing
+                    ? Icons.pause_circle_outlined
+                    : Icons.play_circle_outlined),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -222,39 +285,7 @@ class _SettingScreenState extends State<SettingScreen>
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          TextButton(
-              onPressed: () async {
-                if (audioPlayer == null) {
-                  audioPlayer = AudioPlayer()
-                    ..play(url.isNotEmpty
-                        ? UrlSource(url)
-                        : AssetSource(filePath.replaceAll('assets/', '')));
-                  setState(() {
-                    playing = true;
-                  });
-                  audioPlayer?.onDurationChanged.listen((Duration event) {
-                    setState(() {
-                      max_value = event.inMilliseconds.toDouble();
-                    });
-                  });
-                  audioPlayer?.onPositionChanged.listen((Duration event) {
-                    if (isTap) return;
-                    setState(() {
-                      sliderProgress = event.inMilliseconds.toDouble();
-                      playProgress = event.inMilliseconds;
-                    });
-                  });
-
-                  audioPlayer?.onPlayerStateChanged.listen((PlayerState state) {
-                    setState(() {
-                      playing = state == PlayerState.playing;
-                    });
-                  });
-                } else {
-                  audioPlayer?.resume();
-                }
-              },
-              child: Text("Play")),
+          TextButton(onPressed: () async => await _play(), child: Text("Play")),
           Container(
             width: 10,
           ),
@@ -282,9 +313,11 @@ class _SettingScreenState extends State<SettingScreen>
   List<Widget> buildReaderBackground() {
     return [
       Positioned.fill(
-        child: Image.asset(
-          "assets/images/image0.jpg",
-          fit: BoxFit.cover,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 800),
+          child: playing
+              ? const AnimatedMeshGradientView()
+              : const MeshGradientView(),
         ),
       ),
       Positioned.fill(
