@@ -72,28 +72,40 @@ class Audio {
   /// response format: lrc
   /// model: whisper-1
   static Future<String> transcribeAudio(Uint8List audioFileBytes) async {
+    print('start\n');
+    final Stopwatch _stopwatch = Stopwatch()..start();
     final apiKey = Env.apiKey; // Replace with your Whisper API key
     final uri = Uri.parse(
         'https://api.openai.com/v1/audio/transcriptions'); // Endpoint URL
 
     // Open the audio file
-    var request = http.MultipartRequest('POST', uri);
-    request.fields['model'] = 'whisper-1'; // Specify the model
-    request.fields['response_format'] = 'vtt'; // Specify the response format
+    var request = http.MultipartRequest('POST', uri)
+      ..headers['Authorization'] = 'Bearer $apiKey'
+      ..headers['Content-Type'] = 'multipart/form-data'
+      ..fields['model'] = 'whisper-1'
+      ..fields['response_format'] = 'verbose_json';
+
+    // Explicitly add timestamp_granularities as separate entries
+    List<String> timestampGranularities = ['word', 'segment'];
+    for (String granularity in timestampGranularities) {
+      request.files.add(http.MultipartFile.fromString(
+          'timestamp_granularities[]', granularity));
+    }
+
     // Add the audio file to the request
     request.files.add(http.MultipartFile.fromBytes('file', audioFileBytes,
         filename: 'audio.wav'));
 
-    // Add authorization header
-    request.headers['Authorization'] = 'Bearer $apiKey';
-
     // Send the request
     var response = await request.send();
 
+    print('take: ${_stopwatch.elapsed.inSeconds}seconds.');
+    _stopwatch.stop();
     // Parse the response
     if (response.statusCode == 200) {
       var responseData = await response.stream.bytesToString();
-      return StringUtils.convertWebVttToLrc(responseData);
+      debugPrint(responseData);
+      return responseData;
     } else {
       return 'Failed to transcribe audio. Status code: ${response.statusCode}';
     }

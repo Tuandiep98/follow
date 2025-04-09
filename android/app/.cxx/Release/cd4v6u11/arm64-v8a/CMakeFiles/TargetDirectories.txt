@@ -1,0 +1,2 @@
+E:/demo projects/follow/android/app/.cxx/Release/cd4v6u11/arm64-v8a/CMakeFiles/edit_cache.dir
+E:/demo projects/follow/android/app/.cxx/Release/cd4v6u11/arm64-v8a/CMakeFiles/rebuild_cache.dir

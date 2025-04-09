@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:follow/models/segment.dart';
+import 'package:follow/models/transcribe_response_model.dart';
+import 'package:follow/models/word.dart';
 
 class StringUtils {
   static String convertWebVttToLrc(String webvtt) {
@@ -68,5 +71,85 @@ class StringUtils {
     final lrcSeconds = totalSeconds.padLeft(5, '0'); // "01.00"
 
     return '$lrcMinutes:$lrcSeconds'; // e.g., "00:01.00"
+  }
+
+  String formatDurationToMMSSxx(double durationInSeconds) {
+    // Extract minutes
+    int minutes = (durationInSeconds ~/ 60);
+
+    // Extract seconds (whole part)
+    int seconds = (durationInSeconds.toInt() % 60);
+
+    // Extract hundredths of a second (fractional part)
+    int hundredths =
+        ((durationInSeconds - durationInSeconds.toInt()) * 100).round();
+
+    // Format as [MM:SS.xx] with zero-padding
+    return '[${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}.${hundredths.toString().padLeft(2, '0')}]';
+  }
+
+  static String convertWordSegmentToLrc(String input) {
+    String res = '';
+
+    try {
+      TranscribleResponseModel model =
+          TranscribleResponseModel.fromJson(jsonDecode(input));
+      List<Segment> segments = model.segments;
+      List<Word> words = model.words;
+      String pharses = '';
+      print('words: ${words.length}');
+      print('segments: ${segments.length}');
+      int lastWordPlayTime = 0;
+      for (var segment in segments) {
+        int durationTime = ((segment.end - segment.start) * 1000).toInt();
+        int playTime = (segment.start * 1000).toInt();
+        List<String> wordSplited = segment.text.split(' ');
+        String pharseTemp = '';
+        for (var item in wordSplited) {
+          var itemTemp = item.replaceAll(',', '');
+          itemTemp = item.replaceAll('.', '');
+          if (itemTemp == ' ') {
+            pharseTemp += ' ';
+          } else {
+            var temp = words
+                .where((x) =>
+                    x.word
+                            .replaceAll(',', 'replace')
+                            .replaceAll('.', '')
+                            .toLowerCase() ==
+                        itemTemp.toLowerCase() &&
+                    x.start >= segment.start &&
+                    x.end <= segment.end)
+                .toList();
+            if (temp.isNotEmpty) {
+              Word word = temp.reduce((currentMin, element) =>
+                  currentMin.start < element.start ? currentMin : element);
+              int wordDurationTime = (word.end == word.start)
+                  ? 40
+                  : ((word.end - word.start) * 1000).toInt();
+              int wordPlayTime = (word.start * 1000).toInt();
+              pharseTemp += '$itemTemp ($wordPlayTime,$wordDurationTime)';
+              lastWordPlayTime = wordPlayTime;
+            } else {
+              debugPrint('no word found: $itemTemp');
+              pharseTemp += '$item ($lastWordPlayTime,100)';
+            }
+          }
+        }
+        pharses += '[$playTime,$durationTime]$pharseTemp\n';
+      }
+      res = pharses;
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return res.isNotEmpty
+        ? """[ti:If I Didn't Love You]
+[ar:Jason Aldean/Carrie Underwood]
+[al:If I Didn't Love You]
+[by:]
+[offset:0]
+    $res
+    """
+        : '';
   }
 }

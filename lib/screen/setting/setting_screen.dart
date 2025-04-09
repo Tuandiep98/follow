@@ -3,14 +3,16 @@ import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_lyric/lyric_ui/lyric_ui.dart';
-import 'package:flutter_lyric/lyric_ui/ui_netease.dart';
-import 'package:flutter_lyric/lyrics_log.dart';
-import 'package:flutter_lyric/lyrics_model_builder.dart';
-import 'package:flutter_lyric/lyrics_reader_model.dart';
-import 'package:flutter_lyric/lyrics_reader_widget.dart';
 import 'package:follow/core/audio.dart';
 import 'package:follow/core/storage_manager.dart';
+import 'package:follow/core/string_utils.dart';
+import 'package:follow/core/whisper.dart';
+import 'package:follow/screen/flutter_lyric/lyric_ui/lyric_ui.dart';
+import 'package:follow/screen/flutter_lyric/lyric_ui/ui_netease.dart';
+import 'package:follow/screen/flutter_lyric/lyrics_log.dart';
+import 'package:follow/screen/flutter_lyric/lyrics_model_builder.dart';
+import 'package:follow/screen/flutter_lyric/lyrics_reader_model.dart';
+import 'package:follow/screen/flutter_lyric/lyrics_reader_widget.dart';
 import 'package:follow/screen/setting/const.dart';
 import 'dart:typed_data';
 
@@ -40,60 +42,63 @@ class _SettingScreenState extends State<SettingScreen>
 
   bool _loading = true;
 
-  String filePath = 'assets/music1.mp3';
+  String filePath = 'assets/music2.wav';
   String url = '';
   Uint8List? audioBytes;
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      audioBytes = null;
-      // url =
-      //     'https://cf-media.sndcdn.com/cIL7I5WRmK1t.128.mp3?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiKjovL2NmLW1lZGlhLnNuZGNkbi5jb20vY0lMN0k1V1JtSzF0LjEyOC5tcDMqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzQ0MDE2MzMxfX19XX0_&Signature=GDKKY50QcHitLENsu1ummjL8XBc5nvmrBIt2jCNfNUN3KlMpMpUZFJLBP2QatTtB0BzE91KJJ-2OQjyFIpJjckZGb8XGUDot~xRarp4U2Qf89x4ab70WaRB1EXniYFbueUzMAsxmLoGctrlJThUO45xR0wibCe0dVfNQthwhZxguowY08HpU-AxE2DAhs2xx7AoBBUJONn8bdAns0a0B8sKOFTfRgxOgLzEuKfupcVrXs0B2iGDDTzt3SqKLGfkcmdReRwKDXOYNZG~wi9A35B4t0aeMCrD0cfUBAb5cd1SSTt92jqog9uwQhyG0fHKKgXrYtXSJyIKZNsuJbueZyQ__&Key-Pair-Id=APKAI6TU7MMXM5DG6EPQ';
-      String lyrics = '';
-      var storageData = StorageManager.readData(url.isEmpty ? filePath : url);
-      if (storageData != null) {
-        lyrics = storageData;
-        debugPrint('local result: $lyrics');
-        lyricModel =
-            LyricsModelBuilder.create().bindLyricToMain(lyrics).getModel();
-        setState(() {
-          _loading = false;
-        });
-        return;
-      }
-
-      if (url.isNotEmpty) {
-        audioBytes = await Audio.getOnlineAudioBytes(url);
-        if (audioBytes == null) {
-          debugPrint('audioBytes is null');
-          return;
-        }
-        var response = await Audio.transcribeAudio(audioBytes!);
-        if (response.isNotEmpty) {
-          lyrics = response;
-          debugPrint('url result: $response');
-          StorageManager.saveData(url, lyrics);
-        }
-      } else {
-        XFile file = XFile(filePath);
-        var response = await Audio.transcribeAudio(await file.readAsBytes());
-        if (response.isNotEmpty) {
-          lyrics = response;
-          debugPrint('file result: $response');
-          StorageManager.saveData(filePath, lyrics);
-        }
-      }
-
-      if (lyrics.isNotEmpty) {
-        lyricModel =
-            LyricsModelBuilder.create().bindLyricToMain(lyrics).getModel();
-      }
+      await _initData();
+      // await WhisperNew.transcribe();
       setState(() {
         _loading = false;
       });
     });
 
     super.initState();
+  }
+
+  Future<void> _initData() async {
+    audioBytes = null;
+    // url =
+    //     'https://cf-media.sndcdn.com/cIL7I5WRmK1t.128.mp3?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiKjovL2NmLW1lZGlhLnNuZGNkbi5jb20vY0lMN0k1V1JtSzF0LjEyOC5tcDMqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzQ0MDE2MzMxfX19XX0_&Signature=GDKKY50QcHitLENsu1ummjL8XBc5nvmrBIt2jCNfNUN3KlMpMpUZFJLBP2QatTtB0BzE91KJJ-2OQjyFIpJjckZGb8XGUDot~xRarp4U2Qf89x4ab70WaRB1EXniYFbueUzMAsxmLoGctrlJThUO45xR0wibCe0dVfNQthwhZxguowY08HpU-AxE2DAhs2xx7AoBBUJONn8bdAns0a0B8sKOFTfRgxOgLzEuKfupcVrXs0B2iGDDTzt3SqKLGfkcmdReRwKDXOYNZG~wi9A35B4t0aeMCrD0cfUBAb5cd1SSTt92jqog9uwQhyG0fHKKgXrYtXSJyIKZNsuJbueZyQ__&Key-Pair-Id=APKAI6TU7MMXM5DG6EPQ';
+    String lyrics = '';
+    var storageData = StorageManager.readData(url.isEmpty ? filePath : url);
+    if (storageData != null) {
+      lyrics = StringUtils.convertWordSegmentToLrc(storageData);
+      debugPrint('local result: $lyrics');
+      lyricModel =
+          LyricsModelBuilder.create().bindLyricToMain(lyrics).getModel();
+
+      return;
+    }
+
+    if (url.isNotEmpty) {
+      audioBytes = await Audio.getOnlineAudioBytes(url);
+      if (audioBytes == null) {
+        debugPrint('audioBytes is null');
+        return;
+      }
+      var response = await Audio.transcribeAudio(audioBytes!);
+      if (response.isNotEmpty) {
+        lyrics = StringUtils.convertWordSegmentToLrc(response);
+        debugPrint('url result: $lyrics');
+        StorageManager.saveData(url, response);
+      }
+    } else {
+      XFile file = XFile(filePath);
+      var response = await Audio.transcribeAudio(await file.readAsBytes());
+      if (response.isNotEmpty) {
+        lyrics = StringUtils.convertWordSegmentToLrc(response);
+        debugPrint('file result: $lyrics');
+        StorageManager.saveData(filePath, response);
+      }
+    }
+
+    if (lyrics.isNotEmpty) {
+      lyricModel =
+          LyricsModelBuilder.create().bindLyricToMain(lyrics).getModel();
+    }
   }
 
   @override

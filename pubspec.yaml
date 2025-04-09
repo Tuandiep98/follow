@@ -48,13 +48,13 @@ dependencies:
   flutter_sound: ^9.28.0
   flutter_soloud: ^3.1.4
   flutter_tts: ^4.2.2
-  flutter_lyric: ^2.0.4+6
   audioplayers: ^6.4.0
   js: ^0.7.2
   file_picker: ^10.0.0
   image_picker: ^1.1.2
   shared_preferences: ^2.5.3
   http: ^1.3.0
+  # whisper_flutter_new: ^1.0.1
 
 override_dependencies:
   html: ^0.15.5
@@ -88,6 +88,7 @@ flutter:
     - assets/images/
     - assets/music1.mp3
     - assets/music2.wav
+    - assets/jfk.wav
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
