@@ -44,26 +44,48 @@ class UINetease extends LyricUI {
 
   @override
   TextStyle getPlayingExtTextStyle() => TextStyle(
-      color: Colors.grey[300], fontSize: defaultExtSize, fontFamily: 'SF Pro');
+        color: Colors.grey[300],
+        fontSize: defaultExtSize,
+        fontFamily: 'SF Pro',
+        fontWeight: FontWeight.w900,
+      );
 
   @override
   TextStyle getOtherExtTextStyle() => TextStyle(
-      color: Colors.grey[400], fontSize: defaultExtSize, fontFamily: 'SF Pro');
+        color: Colors.grey[400],
+        fontSize: defaultExtSize,
+        fontFamily: 'SF Pro',
+        fontWeight: FontWeight.w900,
+      );
 
   @override
   TextStyle getOtherMainTextStyle() => TextStyle(
-        color: Colors.grey[200],
+        color: Colors.grey[300],
         fontSize: otherMainSize,
         fontFamily: 'SF Pro',
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w900,
+        shadows: <Shadow>[
+          Shadow(
+            offset: Offset(0.2, 0.5),
+            blurRadius: 0.5,
+            color: Color.fromARGB(255, 0, 0, 0),
+          ),
+        ],
       );
 
   @override
   TextStyle getPlayingMainTextStyle() => TextStyle(
-        color: Colors.white,
+        color: Colors.grey.shade300,
         fontSize: defaultSize,
         fontFamily: 'SF Pro',
         fontWeight: FontWeight.w900,
+        shadows: <Shadow>[
+          Shadow(
+            offset: Offset(0.2, 0.5),
+            blurRadius: 0.5,
+            color: Color.fromARGB(255, 0, 0, 0),
+          ),
+        ],
       );
 
   @override

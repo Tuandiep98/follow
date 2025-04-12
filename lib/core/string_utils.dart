@@ -172,4 +172,10 @@ $res"""
     // Biểu thức chính quy để thay thế các dấu câu tiếng Việt
     return text.replaceAll(RegExp(r'[^\w\s]'), '');
   }
+
+  static String millisToMinutesSeconds(int milliseconds) {
+    int minutes = (milliseconds / (1000 * 60)).floor();
+    int seconds = ((milliseconds / 1000) % 60).floor();
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
 }

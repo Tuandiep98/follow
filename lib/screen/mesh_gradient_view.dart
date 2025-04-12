@@ -25,28 +25,28 @@ class _MeshGradientViewState extends State<MeshGradientView>
             -1,
             0.2,
           ),
-          color: const Color.fromARGB(0, 0, 0, 0),
+          color: const Color.fromARGB(255, 255, 255, 255),
         ),
         MeshGradientPoint(
           position: const Offset(
             2,
             0.6,
           ),
-          color: const Color.fromARGB(0, 0, 0, 0),
+          color: const Color.fromARGB(255, 255, 255, 255),
         ),
         MeshGradientPoint(
           position: const Offset(
             0.7,
             0.3,
           ),
-          color: const Color.fromARGB(0, 0, 0, 0),
+          color: const Color.fromARGB(255, 255, 255, 255),
         ),
         MeshGradientPoint(
           position: const Offset(
             0.4,
             0.8,
           ),
-          color: const Color.fromARGB(0, 0, 0, 0),
+          color: const Color.fromARGB(255, 255, 255, 255),
         ),
       ],
       vsync: this,

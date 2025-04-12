@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:follow/core/AI.dart';
 import 'package:follow/core/storage_manager.dart';
 import 'package:follow/models/response_data.dart';
+import 'package:follow/screen/setting/setting_screen.dart';
 
 import 'screen/home_screen.dart';
 import 'screen/widgets/my_custom_scroll_behavior.dart';
@@ -27,13 +29,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        fontFamily: 'NotoSansSC',
+        fontFamily: 'SF Pro',
       ).copyWith(
         scaffoldBackgroundColor: darkBlue,
       ),
       debugShowCheckedModeBanner: false,
       scrollBehavior: MyCustomScrollBehavior(),
-      home: HomeScreen(),
+      home: SettingScreen(
+        screenColor: Color.fromARGB(
+          255, // Fully opaque
+          Random().nextInt(256), // Red (0-255)
+          Random().nextInt(256), // Green (0-255)
+          Random().nextInt(256), // Blue (0-255)
+        ),
+      ),
     );
   }
 }
@@ -210,7 +219,7 @@ class LocationListItem extends StatelessWidget {
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              fontFamily: 'NotoSansSC',
+              fontFamily: 'SF Pro',
             ),
           ),
           Text(

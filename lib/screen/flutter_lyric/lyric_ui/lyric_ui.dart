@@ -62,7 +62,7 @@ abstract class LyricUI {
 
   HighlightDirection getHighlightDirection() => HighlightDirection.LTR;
 
-  Color getLyricHightlightColor() => Colors.amber;
+  Color getLyricHightlightColor() => Colors.white;
 
   @override
   String toString() {

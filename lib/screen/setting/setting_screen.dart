@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -6,21 +7,24 @@ import 'package:flutter/material.dart';
 import 'package:follow/core/audio.dart';
 import 'package:follow/core/storage_manager.dart';
 import 'package:follow/core/string_utils.dart';
-import 'package:follow/screen/animated_mesh_gradient_view.dart';
+import 'package:follow/screen/fluid_backgroud.dart';
 import 'package:follow/screen/flutter_lyric/lyric_ui/lyric_ui.dart';
 import 'package:follow/screen/flutter_lyric/lyric_ui/ui_netease.dart';
 import 'package:follow/screen/flutter_lyric/lyrics_log.dart';
 import 'package:follow/screen/flutter_lyric/lyrics_model_builder.dart';
 import 'package:follow/screen/flutter_lyric/lyrics_reader_model.dart';
 import 'package:follow/screen/flutter_lyric/lyrics_reader_widget.dart';
-import 'package:follow/screen/mesh_gradient_view.dart';
 import 'package:follow/screen/setting/const.dart';
+import 'package:follow/screen/setting/widget/player_control.dart';
+import 'package:follow/screen/setting/widget/progress_bar.dart';
+import 'package:follow/screen/wave_blob/wave_blob.dart';
 import 'dart:typed_data';
 
 import 'package:image_picker/image_picker.dart';
 
 class SettingScreen extends StatefulWidget {
-  const SettingScreen({super.key});
+  final Color screenColor;
+  const SettingScreen({super.key, required this.screenColor});
 
   @override
   State<SettingScreen> createState() => _SettingScreenState();
@@ -31,8 +35,9 @@ class _SettingScreenState extends State<SettingScreen>
   AudioPlayer? audioPlayer;
   double sliderProgress = 111658;
   int playProgress = 111658;
-  double max_value = 311658;
+  double max_value = 0;
   bool isTap = false;
+  var playing = false;
 
   var exampleLyric = '';
 
@@ -50,7 +55,8 @@ class _SettingScreenState extends State<SettingScreen>
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _initData();
+      // await _initData();
+      await _test();
       // await WhisperNew.transcribe();
       setState(() {
         _loading = false;
@@ -58,6 +64,13 @@ class _SettingScreenState extends State<SettingScreen>
     });
 
     super.initState();
+  }
+
+  Future<void> _test() async {
+    lyricModel = LyricsModelBuilder.create()
+        .bindLyricToExt(transLyric)
+        .bindLyricToMain(advancedLyric)
+        .getModel();
   }
 
   Future<void> _initData() async {
@@ -163,16 +176,6 @@ class _SettingScreenState extends State<SettingScreen>
               Expanded(
                 child: buildReaderWidget(),
               ),
-              // Expanded(
-              //   child: SingleChildScrollView(
-              //     child: Column(
-              //       children: [
-              //         ...buildPlayControl(),
-              //         // ...buildUIControl(),
-              //       ],
-              //     ),
-              //   ),
-              // ),
             ],
           );
   }
@@ -190,23 +193,27 @@ class _SettingScreenState extends State<SettingScreen>
           position: playProgress,
           lyricUi: lyricUI,
           playing: playing,
-          size: Size(double.infinity, double.infinity),
+          size: Size(double.infinity, MediaQuery.of(context).size.height * .95),
           emptyBuilder: () => Center(
             child: Text(
               "No lyrics",
               style: lyricUI.getOtherMainTextStyle(),
             ),
           ),
+          onTap: () async => await _play(),
           selectLineBuilder: (progress, confirm) {
             return Row(
               children: [
                 IconButton(
-                    onPressed: () {
+                    onPressed: () async {
                       LyricsLog.logD("点击事件");
                       confirm.call();
                       setState(() {
                         audioPlayer?.seek(Duration(milliseconds: progress));
                       });
+                      if (!playing) {
+                        await _play();
+                      }
                     },
                     icon: Icon(Icons.play_arrow, color: Colors.green)),
                 Expanded(
@@ -217,7 +224,7 @@ class _SettingScreenState extends State<SettingScreen>
                   ),
                 ),
                 Text(
-                  progress.toString(),
+                  StringUtils.millisToMinutesSeconds(progress),
                   style: TextStyle(color: Colors.green),
                 )
               ],
@@ -225,22 +232,97 @@ class _SettingScreenState extends State<SettingScreen>
           },
         ),
         Positioned(
-          right: 20,
-          bottom: 100,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IconButton(
-                iconSize: 36,
-                color: Colors.white,
-                onPressed: () async => await _play(),
-                icon: Icon(playing
-                    ? Icons.pause_circle_outlined
-                    : Icons.play_circle_outlined),
+          left: 0,
+          bottom: 0,
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: !playing
+                    ? [
+                        Colors.grey.withOpacity(.01),
+                        Colors.grey.withOpacity(.3),
+                        Colors.grey,
+                      ]
+                    : [
+                        widget.screenColor.withOpacity(.01),
+                        widget.screenColor.withOpacity(.15),
+                        widget.screenColor,
+                      ],
               ),
-            ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Title of the track',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontFamily: 'SF Pro',
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  Text(
+                    playing
+                        ? '${StringUtils.millisToMinutesSeconds(playProgress)} / ${StringUtils.millisToMinutesSeconds(max_value.toInt())}'
+                        : 'File attached.',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontFamily: 'SF Pro',
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
+        ),
+        Positioned(
+          right: 10,
+          bottom: 15,
+          child: PlayerControl(
+            playing: playing,
+            color: widget.screenColor,
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          child: max_value > 0
+              ? SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: SliderTheme(
+                    data: SliderThemeData(
+                      thumbShape: SliderComponentShape.noThumb, // Removes thumb
+                      overlayShape:
+                          SliderComponentShape.noOverlay, // Removes overlay
+                      trackShape:
+                          RectangularSliderTrackShape(), // Straight line track
+                      trackHeight: 2.5, // Thin line
+                      activeTrackColor:
+                          Colors.white, // Color for played portion
+                      inactiveTrackColor:
+                          Colors.white10, // Color for unplayed portion
+                    ),
+                    child: Slider(
+                      min: 0,
+                      max: max_value,
+                      value: playProgress.toDouble(),
+                      onChanged: (value) {
+                        // _seek(Duration(seconds: value.toInt()));
+                      },
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
         ),
       ],
     );
@@ -308,16 +390,13 @@ class _SettingScreenState extends State<SettingScreen>
     ];
   }
 
-  var playing = false;
-
   List<Widget> buildReaderBackground() {
     return [
       Positioned.fill(
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 800),
-          child: playing
-              ? const AnimatedMeshGradientView()
-              : const MeshGradientView(),
+        child: FluidBackground(
+          color1: Colors.white,
+          color2: playing ? widget.screenColor : Colors.white,
+          body: const SizedBox(),
         ),
       ),
       Positioned.fill(

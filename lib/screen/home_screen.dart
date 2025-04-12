@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:follow/main.dart';
@@ -22,18 +24,22 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late int currentPage;
   late TabController tabController;
-  final List<PageData> pages = [
-    PageData(const VerticalParallaxCarousel(), Colors.white),
-    PageData(const Center(child: Text('Search')), Colors.black),
-    PageData(const Center(child: Text('Add')), Colors.green),
-    PageData(const Center(child: Text('Favorite')), Colors.blue),
-    PageData(const SettingScreen(), Colors.pink),
-  ];
+  var screenColor = Color.fromARGB(
+    255, // Fully opaque
+    Random().nextInt(256), // Red (0-255)
+    Random().nextInt(256), // Green (0-255)
+    Random().nextInt(256), // Blue (0-255)
+  );
+  List<PageData> pages = [];
 
   @override
   void initState() {
-    currentPage = 0;
-    tabController = TabController(length: 5, vsync: this);
+    pages = [
+      PageData(const VerticalParallaxCarousel(), Colors.white),
+      PageData(SettingScreen(screenColor: screenColor), screenColor),
+    ];
+    currentPage = 1;
+    tabController = TabController(length: 2, vsync: this);
     tabController.animation!.addListener(
       () {
         final value = tabController.animation!.value.round();
@@ -81,7 +87,6 @@ class _HomeScreenState extends State<HomeScreen>
         duration: Duration(seconds: 1),
         curve: Curves.decelerate,
         showIcon: true,
-        width: MediaQuery.of(context).size.width * 0.8,
         barColor: pages[currentPage].color.computeLuminance() > 0.5
             ? Colors.black
             : Colors.white,
@@ -121,65 +126,44 @@ class _HomeScreenState extends State<HomeScreen>
           indicatorPadding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
           controller: tabController,
           indicator: UnderlineTabIndicator(
-              borderSide: BorderSide(
-                  color: currentPage == 0
-                      ? pages[0].color
-                      : currentPage == 1
-                          ? pages[1].color
-                          : currentPage == 2
-                              ? pages[2].color
-                              : currentPage == 3
-                                  ? pages[3].color
-                                  : currentPage == 4
-                                      ? pages[4].color
-                                      : unselectedColor,
-                  width: 4),
-              insets: EdgeInsets.fromLTRB(16, 0, 16, 8)),
+            borderSide: BorderSide(
+              color: currentPage == 0
+                  ? pages[0].color
+                  : currentPage == 1
+                      ? pages[1].color
+                      : unselectedColor,
+              width: 2,
+            ),
+            insets: EdgeInsets.fromLTRB(16, 0, 16, 8),
+          ),
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: WidgetStateProperty.resolveWith<Color?>(
+            (Set<WidgetState> states) {
+              return states.contains(WidgetState.focused)
+                  ? null
+                  : Colors.transparent;
+            },
+          ),
           tabs: [
             SizedBox(
               height: 55,
               width: 40,
               child: Center(
-                  child: Icon(
-                Icons.home,
-                color: currentPage == 0 ? pages[0].color : unselectedColor,
-              )),
+                child: Icon(
+                  Icons.home,
+                  color: currentPage == 0 ? pages[0].color : unselectedColor,
+                ),
+              ),
             ),
             SizedBox(
               height: 55,
               width: 40,
               child: Center(
-                  child: Icon(
-                Icons.search,
-                color: currentPage == 1 ? pages[1].color : unselectedColor,
-              )),
-            ),
-            SizedBox(
-              height: 55,
-              width: 40,
-              child: Center(
-                  child: Icon(
-                Icons.add,
-                color: currentPage == 2 ? pages[2].color : unselectedColor,
-              )),
-            ),
-            SizedBox(
-              height: 55,
-              width: 40,
-              child: Center(
-                  child: Icon(
-                Icons.favorite,
-                color: currentPage == 3 ? pages[3].color : unselectedColor,
-              )),
-            ),
-            SizedBox(
-              height: 55,
-              width: 40,
-              child: Center(
-                  child: Icon(
-                Icons.settings,
-                color: currentPage == 4 ? pages[4].color : unselectedColor,
-              )),
+                child: Icon(
+                  Icons.settings,
+                  color: currentPage == 1 ? pages[1].color : unselectedColor,
+                ),
+              ),
             ),
           ],
         ),

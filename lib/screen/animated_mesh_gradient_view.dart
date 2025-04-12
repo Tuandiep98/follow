@@ -17,7 +17,7 @@ class AnimatedMeshGradientView extends StatelessWidget {
           Colors.yellow,
           Colors.white,
         ],
-        options: AnimatedMeshGradientOptions(speed: 0.25),
+        options: AnimatedMeshGradientOptions(speed: 0.5),
       ),
     );
   }
