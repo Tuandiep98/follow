@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 ///all lyric UI should be extends this file
 abstract class LyricUI {
   ///主歌词样式（播放行）
-  TextStyle getPlayingMainTextStyle();
+  TextStyle getPlayingMainTextStyle({Size? size});
 
   ///扩展歌词样式（播放行）
   TextStyle getPlayingExtTextStyle();

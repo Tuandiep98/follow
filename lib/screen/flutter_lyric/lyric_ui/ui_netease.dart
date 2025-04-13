@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:follow/core/platform_util.dart';
 import 'package:follow/screen/flutter_lyric/lyric_ui/lyric_ui.dart';
 
 ///Sample Netease style
@@ -74,9 +75,11 @@ class UINetease extends LyricUI {
       );
 
   @override
-  TextStyle getPlayingMainTextStyle() => TextStyle(
+  TextStyle getPlayingMainTextStyle({Size? size}) => TextStyle(
         color: Colors.grey.shade300,
-        fontSize: defaultSize,
+        fontSize: size == null
+            ? defaultSize
+            : (PlatformUtil.getScalePoint(size.width) * defaultSize),
         fontFamily: 'SF Pro',
         fontWeight: FontWeight.w900,
         shadows: <Shadow>[

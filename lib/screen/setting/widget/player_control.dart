@@ -60,7 +60,7 @@ class _PlayerControlState extends State<PlayerControl> {
                 Colors.white.withOpacity(.0001),
               ],
         child: Icon(
-          Icons.music_note_rounded,
+          widget.playing ? Icons.music_note_rounded : Icons.play_arrow_rounded,
           color: Colors.white,
           size: 25.0,
         ),

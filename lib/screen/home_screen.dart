@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:follow/main.dart';
 import 'package:follow/screen/bottom_bar/bottom_bar.dart';
-import 'package:follow/screen/setting/setting_screen.dart';
+import 'package:follow/screen/setting/player_screen.dart';
 import 'package:very_good_infinite_list/very_good_infinite_list.dart';
 
 class PageData {
@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     pages = [
       PageData(const VerticalParallaxCarousel(), Colors.white),
-      PageData(SettingScreen(screenColor: screenColor), screenColor),
+      PageData(PlayerScreen(screenColor: screenColor), screenColor),
     ];
     currentPage = 1;
     tabController = TabController(length: 2, vsync: this);

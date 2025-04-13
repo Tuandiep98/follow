@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:follow/core/platform_util.dart';
 import 'lyric_ui/lyric_ui.dart';
 import 'lyric_ui/ui_netease.dart';
 import 'lyrics_log.dart';
@@ -34,7 +35,8 @@ class LyricsReader extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => LyricReaderState();
 
-  LyricsReader({super.key, 
+  LyricsReader({
+    super.key,
     this.position = 0,
     this.model,
     this.padding,
@@ -173,11 +175,10 @@ class LyricReaderState extends State<LyricsReader>
           disposeLine();
         }
       });
-    animate
-      .addListener(() {
-        var value = animate.value;
-        lyricPaint.lyricOffset = value.clamp(lyricPaint.maxOffset, 0);
-      });
+    animate.addListener(() {
+      var value = animate.value;
+      lyricPaint.lyricOffset = value.clamp(lyricPaint.maxOffset, 0);
+    });
     _lineController?.forward();
   }
 
@@ -193,7 +194,7 @@ class LyricReaderState extends State<LyricsReader>
             element.extText, widget.ui.getOtherExtTextStyle(),
             size: size)
         ..playingMainTextPainter = getTextPaint(
-            element.mainText, widget.ui.getPlayingMainTextStyle(),
+            element.mainText, widget.ui.getPlayingMainTextStyle(size: size),
             size: size)
         ..otherMainTextPainter = getTextPaint(
             element.mainText, widget.ui.getOtherMainTextStyle(),
@@ -205,6 +206,7 @@ class LyricReaderState extends State<LyricsReader>
             element.spanList ?? element.defaultSpanList,
             TextPainter(
               textDirection: TextDirection.ltr,
+              textScaleFactor: PlatformUtil.getScalePoint(size.width).toDouble(),
             ));
       }
       element.drawInfo = drawInfo;
@@ -216,8 +218,8 @@ class LyricReaderState extends State<LyricsReader>
       {Size? size, TextPainter? linePaint}) {
     text ??= "";
     linePaint ??= TextPainter(
-        textDirection: TextDirection.ltr,
-      );
+      textDirection: TextDirection.ltr,
+    );
     linePaint.textAlign = lyricPaint.lyricUI.getLyricTextAligin();
     linePaint
       ..text = TextSpan(text: text, style: style)
@@ -457,8 +459,10 @@ class LyricReaderState extends State<LyricsReader>
     painter.textAlign = lyricPaint.lyricUI.getLyricTextAligin();
     for (var element in spanList) {
       painter
-        ..text =
-            TextSpan(text: element.raw, style: ui.getPlayingMainTextStyle())
+        ..text = TextSpan(
+            text: element.raw,
+            style: ui.getPlayingMainTextStyle(
+                size: Size(element.drawWidth, element.drawHeight)))
         ..layout();
       element.drawHeight = painter.height;
       element.drawWidth = painter.width;

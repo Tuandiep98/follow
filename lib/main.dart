@@ -8,7 +8,7 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:follow/core/AI.dart';
 import 'package:follow/core/storage_manager.dart';
 import 'package:follow/models/response_data.dart';
-import 'package:follow/screen/setting/setting_screen.dart';
+import 'package:follow/screen/setting/player_screen.dart';
 
 import 'screen/home_screen.dart';
 import 'screen/widgets/my_custom_scroll_behavior.dart';
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       scrollBehavior: MyCustomScrollBehavior(),
-      home: SettingScreen(
+      home: PlayerScreen(
         screenColor: Color.fromARGB(
           255, // Fully opaque
           Random().nextInt(256), // Red (0-255)

@@ -16,26 +16,24 @@ import 'package:follow/screen/flutter_lyric/lyrics_reader_model.dart';
 import 'package:follow/screen/flutter_lyric/lyrics_reader_widget.dart';
 import 'package:follow/screen/setting/const.dart';
 import 'package:follow/screen/setting/widget/player_control.dart';
-import 'package:follow/screen/setting/widget/progress_bar.dart';
-import 'package:follow/screen/wave_blob/wave_blob.dart';
 import 'dart:typed_data';
 
 import 'package:image_picker/image_picker.dart';
 
-class SettingScreen extends StatefulWidget {
+class PlayerScreen extends StatefulWidget {
   final Color screenColor;
-  const SettingScreen({super.key, required this.screenColor});
+  const PlayerScreen({super.key, required this.screenColor});
 
   @override
-  State<SettingScreen> createState() => _SettingScreenState();
+  State<PlayerScreen> createState() => _PlayerScreenState();
 }
 
-class _SettingScreenState extends State<SettingScreen>
+class _PlayerScreenState extends State<PlayerScreen>
     with SingleTickerProviderStateMixin {
   AudioPlayer? audioPlayer;
   double sliderProgress = 111658;
   int playProgress = 111658;
-  double max_value = 0;
+  double maxValue = 0;
   bool isTap = false;
   var playing = false;
 
@@ -133,7 +131,7 @@ class _SettingScreenState extends State<SettingScreen>
         });
         audioPlayer?.onDurationChanged.listen((Duration event) {
           setState(() {
-            max_value = event.inMilliseconds.toDouble();
+            maxValue = event.inMilliseconds.toDouble();
           });
         });
         audioPlayer?.onPositionChanged.listen((Duration event) {
@@ -193,7 +191,7 @@ class _SettingScreenState extends State<SettingScreen>
           position: playProgress,
           lyricUi: lyricUI,
           playing: playing,
-          size: Size(double.infinity, MediaQuery.of(context).size.height * .95),
+          size: Size(double.infinity, MediaQuery.of(context).size.height),
           emptyBuilder: () => Center(
             child: Text(
               "No lyrics",
@@ -215,17 +213,17 @@ class _SettingScreenState extends State<SettingScreen>
                         await _play();
                       }
                     },
-                    icon: Icon(Icons.play_arrow, color: Colors.green)),
+                    icon: Icon(Icons.play_arrow, color: Colors.white)),
                 Expanded(
                   child: Container(
-                    decoration: BoxDecoration(color: Colors.green),
-                    height: 1,
+                    decoration: BoxDecoration(color: Colors.white),
+                    height: 2,
                     width: double.infinity,
                   ),
                 ),
                 Text(
-                  StringUtils.millisToMinutesSeconds(progress),
-                  style: TextStyle(color: Colors.green),
+                  '  ${StringUtils.millisToMinutesSeconds(progress)}  ',
+                  style: TextStyle(color: Colors.white),
                 )
               ],
             );
@@ -271,7 +269,7 @@ class _SettingScreenState extends State<SettingScreen>
                   ),
                   Text(
                     playing
-                        ? '${StringUtils.millisToMinutesSeconds(playProgress)} / ${StringUtils.millisToMinutesSeconds(max_value.toInt())}'
+                        ? '${StringUtils.millisToMinutesSeconds(playProgress)} / ${StringUtils.millisToMinutesSeconds(maxValue.toInt())}'
                         : 'File attached.',
                     style: TextStyle(
                       color: Colors.white,
@@ -288,37 +286,34 @@ class _SettingScreenState extends State<SettingScreen>
         Positioned(
           right: 10,
           bottom: 15,
-          child: PlayerControl(
-            playing: playing,
-            color: widget.screenColor,
+          child: GestureDetector(
+            onTap: () async => await _play(),
+            child: PlayerControl(
+              playing: playing,
+              color: widget.screenColor,
+            ),
           ),
         ),
         Positioned(
           bottom: 0,
           left: 0,
-          child: max_value > 0
+          child: maxValue > 0
               ? SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: SliderTheme(
                     data: SliderThemeData(
-                      thumbShape: SliderComponentShape.noThumb, // Removes thumb
-                      overlayShape:
-                          SliderComponentShape.noOverlay, // Removes overlay
-                      trackShape:
-                          RectangularSliderTrackShape(), // Straight line track
-                      trackHeight: 2.5, // Thin line
-                      activeTrackColor:
-                          Colors.white, // Color for played portion
-                      inactiveTrackColor:
-                          Colors.white10, // Color for unplayed portion
+                      thumbShape: SliderComponentShape.noThumb,
+                      overlayShape: SliderComponentShape.noOverlay,
+                      trackShape: RectangularSliderTrackShape(),
+                      trackHeight: 2.5,
+                      activeTrackColor: Colors.white,
+                      inactiveTrackColor: Colors.white10,
                     ),
                     child: Slider(
                       min: 0,
-                      max: max_value,
+                      max: maxValue,
                       value: playProgress.toDouble(),
-                      onChanged: (value) {
-                        // _seek(Duration(seconds: value.toInt()));
-                      },
+                      onChanged: (value) {},
                     ),
                   ),
                 )
@@ -340,10 +335,10 @@ class _SettingScreenState extends State<SettingScreen>
           color: Colors.green,
         ),
       ),
-      if (sliderProgress < max_value)
+      if (sliderProgress < maxValue)
         Slider(
           min: 0,
-          max: max_value,
+          max: maxValue,
           label: sliderProgress.toString(),
           value: sliderProgress,
           activeColor: Colors.blueGrey,
