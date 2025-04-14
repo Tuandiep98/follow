@@ -60,9 +60,11 @@ class UINetease extends LyricUI {
       );
 
   @override
-  TextStyle getOtherMainTextStyle() => TextStyle(
-        color: Colors.grey[300],
-        fontSize: otherMainSize,
+  TextStyle getOtherMainTextStyle({Size? size}) => TextStyle(
+        color: Colors.grey[350],
+        fontSize: size == null
+            ? otherMainSize
+            : (PlatformUtil.getScalePoint(size.width) * otherMainSize),
         fontFamily: 'SF Pro',
         fontWeight: FontWeight.w900,
         shadows: <Shadow>[

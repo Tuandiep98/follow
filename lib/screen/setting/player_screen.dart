@@ -232,25 +232,8 @@ class _PlayerScreenState extends State<PlayerScreen>
         Positioned(
           left: 0,
           bottom: 0,
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: !playing
-                    ? [
-                        Colors.grey.withOpacity(.01),
-                        Colors.grey.withOpacity(.3),
-                        Colors.grey,
-                      ]
-                    : [
-                        widget.screenColor.withOpacity(.01),
-                        widget.screenColor.withOpacity(.15),
-                        widget.screenColor,
-                      ],
-              ),
-            ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               child: Column(

@@ -10,7 +10,7 @@ abstract class LyricUI {
   TextStyle getPlayingExtTextStyle();
 
   ///主歌词样式（其他行）
-  TextStyle getOtherMainTextStyle();
+  TextStyle getOtherMainTextStyle({Size? size});
 
   ///扩展歌词样式（其他行）
   TextStyle getOtherExtTextStyle();

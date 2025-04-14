@@ -197,7 +197,7 @@ class LyricReaderState extends State<LyricsReader>
             element.mainText, widget.ui.getPlayingMainTextStyle(size: size),
             size: size)
         ..otherMainTextPainter = getTextPaint(
-            element.mainText, widget.ui.getOtherMainTextStyle(),
+            element.mainText, widget.ui.getOtherMainTextStyle(size: size),
             size: size);
       if (widget.ui.enableHighlight()) {
         setTextInlineInfo(drawInfo, widget.ui, element.mainText!);
