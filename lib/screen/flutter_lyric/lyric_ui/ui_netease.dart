@@ -18,9 +18,9 @@ class UINetease extends LyricUI {
   HighlightDirection highlightDirection;
 
   UINetease(
-      {this.defaultSize = 24,
-      this.defaultExtSize = 18,
-      this.otherMainSize = 22,
+      {this.defaultSize = 26,
+      this.defaultExtSize = 20,
+      this.otherMainSize = 24,
       this.bias = 0.5,
       this.lineGap = 25,
       this.inlineGap = 25,
