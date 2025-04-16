@@ -156,6 +156,59 @@ class _PlayerScreenState extends State<PlayerScreen>
     }
   }
 
+  void _showCustomDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25.0),
+          ),
+          child: Container(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+              minWidth: 450,
+            ),
+            padding: EdgeInsets.all(16.0),
+            child: Stack(
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Setting',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                  ],
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: CircleBorder(),
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      minimumSize: Size(40, 40),
+                    ),
+                    child: Icon(Icons.close),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -232,36 +285,40 @@ class _PlayerScreenState extends State<PlayerScreen>
         Positioned(
           left: 0,
           bottom: 0,
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Title of the track',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontFamily: 'SF Pro',
-                      fontWeight: FontWeight.w900,
+          child: InkWell(
+            onTap: () => _showCustomDialog(context),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Title of the track',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontFamily: 'SF Pro',
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
-                  ),
-                  Text(
-                    playing
-                        ? '${StringUtils.millisToMinutesSeconds(playProgress)} / ${StringUtils.millisToMinutesSeconds(maxValue.toInt())}'
-                        : 'File attached.',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontFamily: 'SF Pro',
-                      fontWeight: FontWeight.w900,
+                    Text(
+                      playing
+                          ? '${StringUtils.millisToMinutesSeconds(playProgress)} / ${StringUtils.millisToMinutesSeconds(maxValue.toInt())}'
+                          : 'File attached.',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontFamily: 'SF Pro',
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -269,7 +326,7 @@ class _PlayerScreenState extends State<PlayerScreen>
         Positioned(
           right: 10,
           bottom: 15,
-          child: GestureDetector(
+          child: InkWell(
             onTap: () async => await _play(),
             child: PlayerControl(
               playing: playing,
